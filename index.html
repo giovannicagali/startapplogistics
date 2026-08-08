@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analisi fermi impianto · Centro logistico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --concrete:#E7E8E3;
+  --concrete-deep:#DBDDD6;
+  --paper:#F2F3EF;
+  --ink:#14181B;
+  --steel:#6E7780;
+  --hair:#C6C9C0;
+  --amber:#F0A400;
+  --amber-soft:#F7D48A;
+  --teal:#1F5061;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--concrete);
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+  font-size:14px;
+  font-weight:300;
+  line-height:20px;
+  letter-spacing:normal;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- tipografia ---------- */
+.display{
+  font-size:96px;
+  font-weight:300;
+  line-height:96px;
+  letter-spacing:-0.025em;
+}
+.display-sm{
+  font-size:52px;
+  font-weight:300;
+  line-height:56px;
+  letter-spacing:-0.025em;
+}
+.label{
+  font-size:16px;
+  font-weight:500;
+  line-height:24px;
+}
+.eyebrow{
+  font-size:16px;
+  font-weight:500;
+  line-height:24px;
+  color:var(--steel);
+}
+.micro{
+  font-size:11px;
+  font-weight:500;
+  line-height:16px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--steel);
+}
+.lede{
+  font-size:20px;
+  font-weight:300;
+  line-height:30px;
+  max-width:62ch;
+}
+p{max-width:66ch}
+strong{font-weight:500}
+
+/* ---------- struttura ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(231,232,227,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--hair);
+}
+.topbar-in{
+  max-width:1180px;margin:0 auto;padding:14px 40px;
+  display:flex;gap:24px;align-items:baseline;justify-content:space-between;
+}
+.topbar-title{font-size:13px;font-weight:500}
+.topbar-meta{font-size:12px;color:var(--steel);font-weight:300}
+
+.hazard{
+  height:8px;
+  background:repeating-linear-gradient(135deg,var(--amber) 0 12px,var(--ink) 12px 24px);
+}
+
+section{padding:104px 0;border-bottom:1px solid var(--hair)}
+section:last-of-type{border-bottom:none}
+
+.sec-head{margin-bottom:56px;max-width:70ch}
+.sec-head h2{
+  font-size:34px;font-weight:300;line-height:42px;letter-spacing:-0.02em;margin:10px 0 18px;
+}
+.sec-head p{color:var(--steel)}
+
+/* ---------- hero ---------- */
+.hero{padding:112px 0 88px;border-bottom:none}
+.hero .display{max-width:16ch;margin:26px 0 34px}
+.hero .display em{font-style:normal;color:var(--amber);}
+.hero-note{color:var(--steel);max-width:56ch}
+
+.figures{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--ink);margin-top:64px;
+}
+.fig{padding:22px 20px 0 0;border-right:1px solid var(--hair)}
+.fig:last-child{border-right:none}
+.fig-n{font-size:40px;font-weight:300;line-height:46px;letter-spacing:-0.02em;display:block}
+.fig-l{color:var(--steel);margin-top:6px;display:block;max-width:26ch}
+
+/* ---------- slopegraph ---------- */
+.slope-frame{background:var(--paper);border:1px solid var(--hair);padding:8px}
+.slope svg{display:block;width:100%;height:auto}
+.slope-row{cursor:default}
+.slope-line{stroke:var(--hair);stroke-width:1.5;fill:none;transition:stroke .2s}
+.slope-line.hot{stroke:var(--amber);stroke-width:3}
+.slope-dot{fill:var(--steel)}
+.slope-dot.hot{fill:var(--amber)}
+.slope-txt{font-family:Inter,sans-serif;font-size:13px;font-weight:300;fill:var(--steel)}
+.slope-txt.hot{fill:var(--ink);font-weight:500}
+.slope-num{font-family:Inter,sans-serif;font-size:12px;font-weight:300;fill:var(--steel)}
+.slope-num.hot{fill:var(--ink);font-weight:500}
+.slope-head{font-family:Inter,sans-serif;font-size:11px;font-weight:500;letter-spacing:.08em;fill:var(--steel)}
+.slope-row:hover .slope-line{stroke:var(--ink);stroke-width:3}
+.slope-row:hover .slope-txt,.slope-row:hover .slope-num{fill:var(--ink);font-weight:500}
+.slope-row:hover .slope-dot{fill:var(--ink)}
+
+.slope-mobile{display:none}
+.rankrow{
+  display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:baseline;
+  padding:12px 0;border-bottom:1px solid var(--hair);
+}
+.rankrow:last-child{border-bottom:none}
+.rankrow .code{font-weight:500;font-size:13px}
+.rankrow .desc{display:block;color:var(--steel);font-size:12px;font-weight:300}
+.delta{font-size:13px;font-weight:500;white-space:nowrap}
+.delta.up{color:var(--amber)}
+.delta.down{color:var(--steel)}
+
+.callout{
+  margin-top:40px;border-left:3px solid var(--amber);padding:4px 0 4px 22px;
+}
+.callout p{font-size:17px;line-height:27px}
+
+/* ---------- mappa impianto ---------- */
+.plant{background:var(--paper);border:1px solid var(--hair);padding:28px}
+.plant svg{display:block;width:100%;height:auto}
+.plant-legend{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;align-items:center}
+.swatch{display:inline-block;width:26px;height:10px;margin-right:8px;vertical-align:middle}
+.legend-item{font-size:12px;color:var(--steel)}
+
+/* ---------- tabella ---------- */
+.tablewrap{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;min-width:620px}
+th{
+  text-align:left;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--steel);padding:0 16px 12px 0;border-bottom:1px solid var(--ink);white-space:nowrap;
+}
+th.num,td.num{text-align:right;padding-right:0}
+td{padding:13px 16px 13px 0;border-bottom:1px solid var(--hair);font-size:14px;font-weight:300}
+td.code{font-weight:500}
+tr.flag td{background:linear-gradient(to right,rgba(240,164,0,.16),rgba(240,164,0,0))}
+.pill{
+  display:inline-block;font-size:11px;font-weight:500;letter-spacing:.04em;
+  padding:2px 8px;border:1px solid var(--amber);color:var(--ink);
+}
+
+/* ---------- turni ---------- */
+.shifts{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:8px}
+.shift{background:var(--paper);border:1px solid var(--hair);padding:24px}
+.shift-name{font-size:16px;font-weight:500}
+.shift-time{color:var(--steel);font-size:12px;margin-bottom:20px;display:block}
+.bar{height:34px;background:var(--concrete-deep);position:relative;margin-bottom:8px}
+.bar span{position:absolute;left:0;top:0;bottom:0;background:var(--teal)}
+.bar.fermo span{background:var(--amber)}
+.bar-l{display:flex;justify-content:space-between;font-size:12px;color:var(--steel);margin-bottom:4px}
+
+/* ---------- micro fermi ---------- */
+.strip-frame{background:var(--paper);border:1px solid var(--hair);padding:26px}
+.strip{display:flex;height:56px;gap:1px;align-items:stretch}
+.strip i{flex:1;background:var(--concrete-deep)}
+.strip i.stop{background:var(--amber)}
+.strip-axis{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--steel)}
+.disclaim{
+  margin-top:26px;border:1px solid var(--hair);padding:18px 20px;background:var(--paper);
+}
+.disclaim p{color:var(--steel);font-size:13px}
+
+/* ---------- interventi ---------- */
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.action{background:var(--paper);border:1px solid var(--hair);padding:28px 26px;display:flex;flex-direction:column}
+.action .code{font-size:16px;font-weight:500}
+.action h3{font-size:20px;font-weight:300;line-height:28px;margin:14px 0 12px;letter-spacing:-0.01em}
+.action .body{color:var(--steel);flex:1}
+.action dl{margin-top:24px;border-top:1px solid var(--ink);padding-top:16px}
+.action .drow{display:flex;justify-content:space-between;padding:7px 0;font-size:13px}
+.action dt{color:var(--steel);font-weight:300}
+.action dd{font-weight:500}
+.action .gain dd{color:var(--ink);font-size:15px}
+
+.total{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:2px;
+}
+.total div{background:var(--ink);color:var(--paper);padding:26px}
+.total .t-n{font-size:36px;font-weight:300;line-height:42px;letter-spacing:-0.02em;display:block}
+.total .t-l{font-size:12px;color:#9AA3AA;margin-top:6px;display:block}
+
+/* ---------- chiusura ---------- */
+.ask{padding:104px 0 96px}
+.ask .display-sm{max-width:20ch;margin-bottom:32px}
+.asklist{border-top:1px solid var(--ink);margin-top:44px}
+.askrow{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:20px 0;border-bottom:1px solid var(--hair)}
+.askrow .k{font-weight:500;font-size:14px}
+.askrow .v{color:var(--steel)}
+
+footer{padding:34px 0 60px;color:var(--steel);font-size:12px}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .wrap,.topbar-in{padding-left:24px;padding-right:24px}
+  .display{font-size:52px;line-height:56px}
+  .display-sm{font-size:34px;line-height:40px}
+  section{padding:72px 0}
+  .figures{grid-template-columns:repeat(2,1fr)}
+  .fig{border-right:none;border-bottom:1px solid var(--hair);padding-bottom:20px}
+  .fig:nth-child(1),.fig:nth-child(2){border-bottom:1px solid var(--hair)}
+  .shifts,.actions,.total{grid-template-columns:1fr}
+  .slope{display:none}
+  .slope-mobile{display:block}
+  .slope-frame{padding:20px}
+  .askrow{grid-template-columns:1fr;gap:4px}
+  .topbar-meta{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+
+a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <span class="topbar-title">Analisi fermi impianto — magazzino automatizzato</span>
+    <span class="topbar-meta">Centro logistico · agosto 2025 — luglio 2026 · 51 codici allarme · 11.842 eventi</span>
+  </div>
+</div>
+<div class="hazard" aria-hidden="true"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">La tesi</span>
+    <h1 class="display">Nove codici allarme su 51 valgono il <em>71%</em> dei minuti di fermo.</h1>
+    <p class="lede hero-note">Non sono i nove che compaiono in cima al Pareto. Il report standard ordina per numero di eventi, e quell'ordine nasconde proprio le macchine che ci costano di più.</p>
+
+    <div class="figures">
+      <div class="fig">
+        <span class="fig-n">768 h</span>
+        <span class="fig-l">Fermo impianto registrato negli ultimi 12 mesi</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">319 k€</span>
+        <span class="fig-l">Impatto a 415 €/h di linea ferma</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">169 h</span>
+        <span class="fig-l">Recuperabili con tre interventi mirati</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">10 sett.</span>
+        <span class="fig-l">Rientro dell'investimento proposto</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLOPEGRAPH -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Il ribaltamento</span>
+      <h2>Stessi dati, due classifiche diverse</h2>
+      <p>A sinistra i codici ordinati per numero di eventi, come li mostra il sistema. A destra gli stessi codici ordinati per minuti di fermo cumulati, cioè eventi × durata media. Le linee che si incrociano sono la parte interessante.</p>
+    </div>
+
+    <div class="slope-frame">
+      <div class="slope">
+        <svg viewBox="0 0 980 580" role="img" aria-label="Confronto tra la classifica dei codici allarme per numero di eventi e per minuti di fermo cumulati">
+          <text x="250" y="26" text-anchor="end" class="slope-head">ORDINATO PER EVENTI</text>
+          <text x="730" y="26" class="slope-head">ORDINATO PER MINUTI DI FERMO</text>
+          <line x1="20" y1="40" x2="960" y2="40" stroke="#C6C9C0" stroke-width="1"/>
+
+          <!-- righe: left rank -> right rank -->
+          <g class="slope-row">
+            <path class="slope-line" d="M262,80 C420,80 560,340 718,340"/>
+            <circle class="slope-dot" cx="258" cy="80" r="3"/><circle class="slope-dot" cx="722" cy="340" r="3"/>
+            <text x="248" y="78" text-anchor="end" class="slope-txt">FC-104 · Fotocellula ingresso baia</text>
+            <text x="248" y="94" text-anchor="end" class="slope-num">4.180 eventi</text>
+            <text x="736" y="338" class="slope-txt">FC-104</text>
+            <text x="736" y="354" class="slope-num">2.926 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line" d="M262,132 C420,132 560,236 718,236"/>
+            <circle class="slope-dot" cx="258" cy="132" r="3"/><circle class="slope-dot" cx="722" cy="236" r="3"/>
+            <text x="248" y="130" text-anchor="end" class="slope-txt">ML-221 · Errore lettura barcode cassetta</text>
+            <text x="248" y="146" text-anchor="end" class="slope-num">3.640 eventi</text>
+            <text x="736" y="234" class="slope-txt">ML-221</text>
+            <text x="736" y="250" class="slope-num">3.276 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line" d="M262,184 C420,184 560,288 718,288"/>
+            <circle class="slope-dot" cx="258" cy="184" r="3"/><circle class="slope-dot" cx="722" cy="288" r="3"/>
+            <text x="248" y="182" text-anchor="end" class="slope-txt">PKS-018 · Inceppamento nastro uscita</text>
+            <text x="248" y="198" text-anchor="end" class="slope-num">2.115 eventi</text>
+            <text x="736" y="286" class="slope-txt">PKS-018</text>
+            <text x="736" y="302" class="slope-num">2.961 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line" d="M262,236 C420,236 560,444 718,444"/>
+            <circle class="slope-dot" cx="258" cy="236" r="3"/><circle class="slope-dot" cx="722" cy="444" r="3"/>
+            <text x="248" y="234" text-anchor="end" class="slope-txt">BEME-071 · Stop emergenza da pulpito</text>
+            <text x="248" y="250" text-anchor="end" class="slope-num">412 eventi</text>
+            <text x="736" y="442" class="slope-txt">BEME-071</text>
+            <text x="736" y="458" class="slope-num">2.554 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line hot" d="M262,288 C420,288 560,132 718,132"/>
+            <circle class="slope-dot hot" cx="258" cy="288" r="4"/><circle class="slope-dot hot" cx="722" cy="132" r="4"/>
+            <text x="248" y="286" text-anchor="end" class="slope-txt hot">TE-330 · Disallineamento forche</text>
+            <text x="248" y="302" text-anchor="end" class="slope-num hot">268 eventi</text>
+            <text x="736" y="130" class="slope-txt hot">TE-330</text>
+            <text x="736" y="146" class="slope-num hot">6.030 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line" d="M262,340 C420,340 560,496 718,496"/>
+            <circle class="slope-dot" cx="258" cy="340" r="3"/><circle class="slope-dot" cx="722" cy="496" r="3"/>
+            <text x="248" y="338" text-anchor="end" class="slope-txt">PKS-046 · Etichettatrice fine consumabile</text>
+            <text x="248" y="354" text-anchor="end" class="slope-num">205 eventi</text>
+            <text x="736" y="494" class="slope-txt">PKS-046</text>
+            <text x="736" y="510" class="slope-num">430 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line hot" d="M262,392 C420,392 560,184 718,184"/>
+            <circle class="slope-dot hot" cx="258" cy="392" r="4"/><circle class="slope-dot hot" cx="722" cy="184" r="4"/>
+            <text x="248" y="390" text-anchor="end" class="slope-txt hot">TE-412 · Sovraccarico asse verticale</text>
+            <text x="248" y="406" text-anchor="end" class="slope-num hot">141 eventi</text>
+            <text x="736" y="182" class="slope-txt hot">TE-412</text>
+            <text x="736" y="198" class="slope-num hot">5.781 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line hot" d="M262,444 C420,444 560,80 718,80"/>
+            <circle class="slope-dot hot" cx="258" cy="444" r="4"/><circle class="slope-dot hot" cx="722" cy="80" r="4"/>
+            <text x="248" y="442" text-anchor="end" class="slope-txt hot">ML-508 · Blocco navetta in corridoio</text>
+            <text x="248" y="458" text-anchor="end" class="slope-num hot">96 eventi</text>
+            <text x="736" y="78" class="slope-txt hot">ML-508</text>
+            <text x="736" y="94" class="slope-num hot">6.096 min</text>
+          </g>
+          <g class="slope-row">
+            <path class="slope-line" d="M262,496 C420,496 560,392 718,392"/>
+            <circle class="slope-dot" cx="258" cy="496" r="3"/><circle class="slope-dot" cx="722" cy="392" r="3"/>
+            <text x="248" y="494" text-anchor="end" class="slope-txt">TE-205 · Errore encoder traslazione</text>
+            <text x="248" y="510" text-anchor="end" class="slope-num">77 eventi</text>
+            <text x="736" y="390" class="slope-txt">TE-205</text>
+            <text x="736" y="406" class="slope-num">2.680 min</text>
+          </g>
+
+          <line x1="20" y1="546" x2="960" y2="546" stroke="#C6C9C0" stroke-width="1"/>
+          <text x="20" y="568" class="slope-num">Passa il mouse su una riga per seguirla.</text>
+        </svg>
+      </div>
+
+      <!-- versione mobile -->
+      <div class="slope-mobile">
+        <div class="micro" style="margin-bottom:14px">Variazione di posizione</div>
+        <div class="rankrow"><span><span class="code">ML-508</span><span class="desc">Blocco navetta in corridoio · 6.096 min</span></span><span class="delta up">8 → 1</span></div>
+        <div class="rankrow"><span><span class="code">TE-330</span><span class="desc">Disallineamento forche · 6.030 min</span></span><span class="delta up">5 → 2</span></div>
+        <div class="rankrow"><span><span class="code">TE-412</span><span class="desc">Sovraccarico asse verticale · 5.781 min</span></span><span class="delta up">7 → 3</span></div>
+        <div class="rankrow"><span><span class="code">ML-221</span><span class="desc">Errore lettura barcode · 3.276 min</span></span><span class="delta down">2 → 4</span></div>
+        <div class="rankrow"><span><span class="code">PKS-018</span><span class="desc">Inceppamento nastro · 2.961 min</span></span><span class="delta down">3 → 5</span></div>
+        <div class="rankrow"><span><span class="code">FC-104</span><span class="desc">Fotocellula ingresso baia · 2.926 min</span></span><span class="delta down">1 → 6</span></div>
+        <div class="rankrow"><span><span class="code">TE-205</span><span class="desc">Errore encoder traslazione · 2.680 min</span></span><span class="delta up">9 → 7</span></div>
+        <div class="rankrow"><span><span class="code">BEME-071</span><span class="desc">Stop emergenza da pulpito · 2.554 min</span></span><span class="delta down">4 → 8</span></div>
+        <div class="rankrow"><span><span class="code">PKS-046</span><span class="desc">Etichettatrice fine consumabile · 430 min</span></span><span class="delta down">6 → 9</span></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>FC-104 scatta 4.180 volte l'anno e si risolve in 42 secondi. ML-508 scatta 96 volte e blocca il corridoio per un'ora. Il primo è il codice più visibile dell'impianto, il secondo è quello che ci costa di più: <strong>63 volte meno eventi, il doppio dei minuti persi</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MAPPA IMPIANTO -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Dove</span>
+      <h2>Il fermo non è distribuito sull'impianto</h2>
+      <p>Pianta schematica del magazzino, con ogni macchina colorata in base ai minuti di fermo dell'ultimo anno. Due macchine su diciassette assorbono il 35% del totale.</p>
+    </div>
+
+    <div class="plant">
+      <svg viewBox="0 0 1000 400" role="img" aria-label="Pianta schematica del magazzino con le macchine colorate in base ai minuti di fermo annui">
+        <!-- corridoi trasloelevatori -->
+        <text x="20" y="30" class="slope-head">AREA PALLET — TRASLOELEVATORI</text>
+        <g>
+          <rect x="20" y="46" width="380" height="34" fill="#F0A400" opacity="0.34"/>
+          <text x="34" y="68" style="font:500 13px Inter;fill:#14181B">TE-01</text>
+          <text x="390" y="68" text-anchor="end" style="font:300 12px Inter;fill:#6E7780">3.140 min · corridoio 1</text>
+        </g>
+        <g>
+          <rect x="20" y="86" width="380" height="34" fill="#F0A400" opacity="0.32"/>
+          <text x="34" y="108" style="font:500 13px Inter;fill:#14181B">TE-02</text>
+          <text x="390" y="108" text-anchor="end" style="font:300 12px Inter;fill:#6E7780">2.980 min · corridoio 2</text>
+        </g>
+        <g>
+          <rect x="20" y="126" width="380" height="34" fill="#F0A400" opacity="0.95"/>
+          <text x="34" y="148" style="font:500 13px Inter;fill:#14181B">TE-03</text>
+          <text x="390" y="148" text-anchor="end" style="font:500 12px Inter;fill:#14181B">7.420 min · corridoio 3</text>
+        </g>
+        <g>
+          <rect x="20" y="166" width="380" height="34" fill="#F0A400" opacity="0.38"/>
+          <text x="34" y="188" style="font:500 13px Inter;fill:#14181B">TE-04</text>
+          <text x="390" y="188" text-anchor="end" style="font:300 12px Inter;fill:#6E7780">3.510 min · corridoio 4</text>
+        </g>
+        <g>
+          <rect x="20" y="206" width="380" height="34" fill="#F0A400" opacity="0.28"/>
+          <text x="34" y="228" style="font:500 13px Inter;fill:#14181B">TE-05</text>
+          <text x="390" y="228" text-anchor="end" style="font:300 12px Inter;fill:#6E7780">2.610 min · corridoio 5</text>
+        </g>
+
+        <!-- miniload -->
+        <text x="440" y="30" class="slope-head">AREA MINILOAD</text>
+        <g>
+          <rect x="440" y="46" width="240" height="54" fill="#F0A400" opacity="0.45"/>
+          <text x="454" y="70" style="font:500 13px Inter;fill:#14181B">ML-01</text>
+          <text x="454" y="88" style="font:300 12px Inter;fill:#6E7780">4.190 min</text>
+        </g>
+        <g>
+          <rect x="440" y="106" width="240" height="54" fill="#F0A400" opacity="1"/>
+          <text x="454" y="130" style="font:500 13px Inter;fill:#14181B">ML-02</text>
+          <text x="454" y="148" style="font:500 12px Inter;fill:#14181B">8.860 min</text>
+          <text x="666" y="130" text-anchor="end" style="font:500 11px Inter;fill:#14181B;letter-spacing:.06em">CRITICO</text>
+        </g>
+        <g>
+          <rect x="440" y="166" width="240" height="54" fill="#F0A400" opacity="0.40"/>
+          <text x="454" y="190" style="font:500 13px Inter;fill:#14181B">ML-03</text>
+          <text x="454" y="208" style="font:300 12px Inter;fill:#6E7780">3.740 min</text>
+        </g>
+
+        <!-- packing + beme -->
+        <text x="720" y="30" class="slope-head">PREPARAZIONE E USCITA</text>
+        <g>
+          <rect x="720" y="46" width="260" height="80" fill="#F0A400" opacity="0.55"/>
+          <text x="734" y="70" style="font:500 13px Inter;fill:#14181B">Packing station 01 — 06</text>
+          <text x="734" y="90" style="font:300 12px Inter;fill:#6E7780">5.120 min complessivi</text>
+          <text x="734" y="110" style="font:300 12px Inter;fill:#6E7780">853 min di media per postazione</text>
+        </g>
+        <g>
+          <rect x="720" y="132" width="260" height="88" fill="#F0A400" opacity="0.49"/>
+          <text x="734" y="156" style="font:500 13px Inter;fill:#14181B">Linea BEME</text>
+          <text x="734" y="176" style="font:300 12px Inter;fill:#6E7780">4.530 min</text>
+          <text x="734" y="196" style="font:300 12px Inter;fill:#6E7780">Depallettizzazione e sorter</text>
+        </g>
+
+        <!-- baie -->
+        <line x1="20" y1="266" x2="980" y2="266" stroke="#C6C9C0"/>
+        <text x="20" y="292" class="slope-head">BAIE DI CARICO</text>
+        <g>
+          <rect x="20" y="306" width="960" height="30" fill="#1F5061" opacity="0.12"/>
+          <text x="34" y="326" style="font:300 12px Inter;fill:#6E7780">Baie 1—8 · nessun fermo impianto imputato · gli allarmi FC-104 nascono qui ma bloccano la linea a monte</text>
+        </g>
+      </svg>
+
+      <div class="plant-legend">
+        <span class="legend-item"><span class="swatch" style="background:#F0A400;opacity:.28"></span>fino a 3.000 min</span>
+        <span class="legend-item"><span class="swatch" style="background:#F0A400;opacity:.5"></span>3.000 — 5.500 min</span>
+        <span class="legend-item"><span class="swatch" style="background:#F0A400;opacity:1"></span>oltre 5.500 min</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MTBF MTTR -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Come stanno le macchine</span>
+      <h2>Tempo medio tra i guasti e tempo medio di ripristino</h2>
+      <p>Il MTBF dice quanto spesso una macchina si ferma, il MTTR quanto ci mette a ripartire. Servono insieme: ML-02 si ferma il doppio delle altre navette e ci mette anche il doppio a tornare in servizio.</p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Macchina</th>
+            <th>Funzione</th>
+            <th class="num">MTBF</th>
+            <th class="num">MTTR</th>
+            <th class="num">Disponibilità</th>
+            <th class="num">Fermo annuo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="code">TE-01</td><td>Trasloelevatore pallet</td><td class="num">142 h</td><td class="num">21 min</td><td class="num">99,4 %</td><td class="num">3.140 min</td></tr>
+          <tr><td class="code">TE-02</td><td>Trasloelevatore pallet</td><td class="num">138 h</td><td class="num">19 min</td><td class="num">99,4 %</td><td class="num">2.980 min</td></tr>
+          <tr class="flag"><td class="code">TE-03 <span class="pill">Attenzione</span></td><td>Trasloelevatore pallet</td><td class="num">61 h</td><td class="num">34 min</td><td class="num">98,6 %</td><td class="num">7.420 min</td></tr>
+          <tr><td class="code">TE-04</td><td>Trasloelevatore pallet</td><td class="num">129 h</td><td class="num">23 min</td><td class="num">99,3 %</td><td class="num">3.510 min</td></tr>
+          <tr><td class="code">TE-05</td><td>Trasloelevatore pallet</td><td class="num">151 h</td><td class="num">17 min</td><td class="num">99,5 %</td><td class="num">2.610 min</td></tr>
+          <tr><td class="code">ML-01</td><td>Navetta miniload</td><td class="num">88 h</td><td class="num">41 min</td><td class="num">99,2 %</td><td class="num">4.190 min</td></tr>
+          <tr class="flag"><td class="code">ML-02 <span class="pill">Critico</span></td><td>Navetta miniload</td><td class="num">47 h</td><td class="num">58 min</td><td class="num">98,3 %</td><td class="num">8.860 min</td></tr>
+          <tr><td class="code">ML-03</td><td>Navetta miniload</td><td class="num">92 h</td><td class="num">38 min</td><td class="num">99,3 %</td><td class="num">3.740 min</td></tr>
+          <tr><td class="code">PKS 01—06</td><td>Postazioni di confezionamento</td><td class="num">34 h</td><td class="num">4 min</td><td class="num">99,8 %</td><td class="num">5.120 min</td></tr>
+          <tr><td class="code">BEME</td><td>Depallettizzazione e sorter</td><td class="num">74 h</td><td class="num">12 min</td><td class="num">99,1 %</td><td class="num">4.530 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TURNI -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Quando</span>
+      <h2>Il turno notte muove meno missioni e perde più minuti</h2>
+      <p>Con il 31% delle missioni la notte accumula il 44% dei minuti di fermo. Su ML-02 lo squilibrio è ancora più netto: 5.020 dei suoi 8.860 minuti si concentrano tra le 22 e le 6.</p>
+    </div>
+
+    <div class="shifts">
+      <div class="shift">
+        <span class="shift-name">Mattino</span>
+        <span class="shift-time">06:00 — 14:00</span>
+        <div class="bar-l"><span>Missioni</span><span>37 %</span></div>
+        <div class="bar"><span style="width:37%"></span></div>
+        <div class="bar-l" style="margin-top:16px"><span>Minuti di fermo</span><span>29 %</span></div>
+        <div class="bar fermo"><span style="width:29%"></span></div>
+      </div>
+      <div class="shift">
+        <span class="shift-name">Pomeriggio</span>
+        <span class="shift-time">14:00 — 22:00</span>
+        <div class="bar-l"><span>Missioni</span><span>32 %</span></div>
+        <div class="bar"><span style="width:32%"></span></div>
+        <div class="bar-l" style="margin-top:16px"><span>Minuti di fermo</span><span>27 %</span></div>
+        <div class="bar fermo"><span style="width:27%"></span></div>
+      </div>
+      <div class="shift">
+        <span class="shift-name">Notte</span>
+        <span class="shift-time">22:00 — 06:00</span>
+        <div class="bar-l"><span>Missioni</span><span>31 %</span></div>
+        <div class="bar"><span style="width:31%"></span></div>
+        <div class="bar-l" style="margin-top:16px"><span>Minuti di fermo</span><span>44 %</span></div>
+        <div class="bar fermo"><span style="width:44%"></span></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>Il dato per turno non è una valutazione delle persone. Di notte il presidio tecnico è ridotto e il MTTR si allunga: lo stesso guasto che di giorno dura 20 minuti, di notte ne dura 50 perché si attende il reperibile. <strong>È un problema di copertura e di procedure di ripristino, non di chi c'è.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- MICRO FERMI -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Quello che il sistema non registra</span>
+      <h2>I micro-arresti sotto la soglia dei 60 secondi</h2>
+      <p>Il WCS non archivia gli arresti che si ripristinano da soli sotto il minuto. Ho cronometrato tre giornate sulla postazione PKS-03: 41 micro-arresti per turno, 17 secondi di media. Nessuno di questi compare in nessun Pareto.</p>
+    </div>
+
+    <div class="strip-frame">
+      <div class="micro" style="margin-bottom:14px">PKS-03 · turno pomeriggio del 14 luglio · ogni tacca è un minuto</div>
+      <div class="strip" id="strip" aria-label="Rappresentazione di un turno di otto ore con i micro-arresti evidenziati"></div>
+      <div class="strip-axis"><span>14:00</span><span>16:00</span><span>18:00</span><span>20:00</span><span>22:00</span></div>
+    </div>
+
+    <div class="figures" style="margin-top:56px">
+      <div class="fig">
+        <span class="fig-n">41</span>
+        <span class="fig-l">Micro-arresti per turno sulla singola postazione</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">11,6 min</span>
+        <span class="fig-l">Persi per turno, pari al 2,4% del tempo disponibile</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">~1.060 h</span>
+        <span class="fig-l">Stima estesa alle sei postazioni su base annua</span>
+      </div>
+      <div class="fig">
+        <span class="fig-n">0</span>
+        <span class="fig-l">Minuti di questi che oggi risultano nei report</span>
+      </div>
+    </div>
+
+    <div class="disclaim">
+      <p><strong>Come va letto questo numero.</strong> La stima annua nasce da un campione di tre giornate su una sola postazione ed è la parte meno solida dell'analisi: la porto qui come ipotesi da verificare, non come risultato. Se anche fosse sovrastimata della metà, resterebbe comparabile a tutto il fermo che oggi misuriamo. Verificarla richiede un contatore di arresti sul PLC di stazione, che è un intervento software da poche ore.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INTERVENTI -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Cosa propongo</span>
+      <h2>Tre interventi sulle prime tre voci</h2>
+      <p>Causa radice ipotizzata sulla base degli interventi già fatti sul campo, e stima di recupero prudenziale. Nessuno dei tre richiede fermo impianto programmato oltre la normale finestra di manutenzione domenicale.</p>
+    </div>
+
+    <div class="actions">
+      <article class="action">
+        <span class="code">ML-508 · ML-02</span>
+        <h3>Blocco navetta in corridoio</h3>
+        <p class="body">I pattini di guida della navetta 2 sono oltre il limite di usura e la navetta va in fuori tolleranza sui cambi di livello. Sostituzione pattini, riverifica del centraggio del corridoio e revisione della procedura di sblocco, che oggi richiede la salita in quota di due operatori.</p>
+        <dl>
+          <div class="drow"><dt>Fermo attuale</dt><dd>6.096 min</dd></div>
+          <div class="drow"><dt>Riduzione attesa</dt><dd>70 %</dd></div>
+          <div class="drow"><dt>Costo</dt><dd>6.800 €</dd></div>
+          <div class="drow gain"><dt>Recupero annuo</dt><dd>29.500 €</dd></div>
+        </dl>
+      </article>
+
+      <article class="action">
+        <span class="code">TE-330 · TE-03</span>
+        <h3>Disallineamento forche</h3>
+        <p class="body">Deriva progressiva dei sensori di centraggio forche dopo l'urto di marzo. Taratura e, soprattutto, modifica della logica di ripresa: oggi ogni disallineamento richiede reset manuale in quota, mentre nella maggior parte dei casi basterebbe un riposizionamento automatico con conferma da terra.</p>
+        <dl>
+          <div class="drow"><dt>Fermo attuale</dt><dd>6.030 min</dd></div>
+          <div class="drow"><dt>Riduzione attesa</dt><dd>55 %</dd></div>
+          <div class="drow"><dt>Costo</dt><dd>2.400 €</dd></div>
+          <div class="drow gain"><dt>Recupero annuo</dt><dd>22.900 €</dd></div>
+        </dl>
+      </article>
+
+      <article class="action">
+        <span class="code">TE-412 · TE-03</span>
+        <h3>Sovraccarico asse verticale</h3>
+        <p class="body">Il 68% degli eventi si concentra sulle missioni con pallet oltre 620 kg destinati ai livelli alti. Revisione della curva di accelerazione per questa classe di missioni e verifica del freno di stazionamento, con riprofilazione delle ubicazioni per i codici più pesanti.</p>
+        <dl>
+          <div class="drow"><dt>Fermo attuale</dt><dd>5.781 min</dd></div>
+          <div class="drow"><dt>Riduzione attesa</dt><dd>45 %</dd></div>
+          <div class="drow"><dt>Costo</dt><dd>3.900 €</dd></div>
+          <div class="drow gain"><dt>Recupero annuo</dt><dd>18.000 €</dd></div>
+        </dl>
+      </article>
+    </div>
+
+    <div class="total">
+      <div><span class="t-n">13.100 €</span><span class="t-l">Investimento complessivo, materiali e ore esterne</span></div>
+      <div><span class="t-n">70.400 €</span><span class="t-l">Recupero annuo stimato, pari a 169 ore di impianto</span></div>
+      <div><span class="t-n">10 sett.</span><span class="t-l">Tempo di rientro dell'investimento</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHIUSURA -->
+<section class="ask">
+  <div class="wrap">
+    <span class="eyebrow">La richiesta</span>
+    <h2 class="display-sm">Un pilota su ML-02, sei settimane, misurato.</h2>
+    <p class="lede">Non chiedo di approvare tutti e tre gli interventi. Chiedo di partire dal primo, sulla macchina peggiore, con KPI concordati prima: se il recupero non arriva, l'analisi era sbagliata e lo sappiamo in sei settimane.</p>
+
+    <div class="asklist">
+      <div class="askrow"><span class="k">Perimetro</span><span class="v">Navetta ML-02, corridoio miniload 2. Nessuna modifica su altre macchine.</span></div>
+      <div class="askrow"><span class="k">Durata</span><span class="v">Due settimane di intervento, quattro di misura post-intervento.</span></div>
+      <div class="askrow"><span class="k">KPI</span><span class="v">Minuti di fermo ML-508 per settimana, MTTR della navetta, numero di salite in quota.</span></div>
+      <div class="askrow"><span class="k">Soglia di successo</span><span class="v">Riduzione di almeno il 50% dei minuti di fermo del codice ML-508.</span></div>
+      <div class="askrow"><span class="k">Cosa serve a me</span><span class="v">Accesso in sola lettura allo storico allarmi del WCS e mezza giornata a settimana dedicata.</span></div>
+      <div class="askrow"><span class="k">Passo successivo</span><span class="v">Contatore dei micro-arresti sul PLC delle packing station, per verificare la stima delle 1.060 ore.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard" aria-hidden="true"></div>
+<footer>
+  <div class="wrap">
+    Analisi elaborata su export dello storico allarmi WCS, agosto 2025 — luglio 2026. Costo orario di linea ferma pari a 415 €/h, fornito da Operations. Le stime di recupero sono prudenziali e vanno validate sul pilota.
+  </div>
+</footer>
+
+<script>
+// Strip del turno: 480 minuti, micro-arresti distribuiti con addensamento nelle ore centrali
+(function(){
+  var strip = document.getElementById('strip');
+  if(!strip) return;
+  var minuti = 120, stops = [];
+  var seed = 7;
+  function rnd(){ seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  while(stops.length < 41){
+    var p = Math.floor(Math.pow(rnd(), 0.85) * minuti);
+    var idx = (p + Math.floor(rnd() * 18)) % minuti;
+    if(stops.indexOf(idx) === -1) stops.push(idx);
+  }
+  var frag = document.createDocumentFragment();
+  for(var i = 0; i < minuti; i++){
+    var t = document.createElement('i');
+    if(stops.indexOf(i) !== -1) t.className = 'stop';
+    frag.appendChild(t);
+  }
+  strip.appendChild(frag);
+})();
+</script>
+
+</body>
+</html>
